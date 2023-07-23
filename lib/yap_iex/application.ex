@@ -8,7 +8,7 @@ defmodule YapIEx.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {Ratatouille.Runtime.Supervisor, runtime: [app: YapIEx.TerminalApp]}
+      # {Ratatouille.Runtime.Supervisor, runtime: [app: YapIEx.TerminalApp]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

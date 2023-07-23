@@ -3,19 +3,21 @@ defmodule YapIEx.TerminalApp do
 
   import Ratatouille.View
 
-  def init(_context), do: 0
+  alias YapIEx.Components.MultiModalText
+
+  def init(_context) do
+    %{multimodal_text: MultiModalText.init([])}
+  end
 
   def update(model, msg) do
-    case msg do
-      {:event, %{ch: ?+}} -> model + 1
-      {:event, %{ch: ?-}} -> model - 1
-      _ -> model
-    end
+    new_multimodal_text = MultiModalText.update(model, msg)
+
+    %{model | multimodal_text: new_multimodal_text}
   end
 
   def render(model) do
     view do
-      label(content: "Counter is #{model} (+/-)")
+      MultiModalText.render(model.multimodal_text)
     end
   end
 end
