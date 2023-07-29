@@ -61,7 +61,8 @@ defmodule YapIEx.Components.MultiModalText do
     %{model | cursor: new_cursor}
   end
 
-  def update(%{cursor: cursor, content: content} = model, {:event, %{key: key}}) when key in @k_backspaces do
+  def update(%{cursor: cursor, content: content} = model, {:event, %{key: key}})
+      when key in @k_backspaces do
     {until_cursor, after_cursor} = split_content_at_cursor(content, cursor)
 
     content = String.slice(until_cursor, 0..-2) <> after_cursor
@@ -134,6 +135,6 @@ defmodule YapIEx.Components.MultiModalText do
   # the second string starts with the character after the cursor, and goes until the end
   defp split_content_at_cursor(content, cursor) do
     # cursor + 1 because the cursor index is 0-based
-    String.split_at(content, cursor+1)
+    String.split_at(content, cursor + 1)
   end
 end

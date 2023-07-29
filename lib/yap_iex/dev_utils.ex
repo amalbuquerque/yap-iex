@@ -8,4 +8,10 @@ defmodule YapIEx.DevUtils do
       ]
     )
   end
+
+  def clean_all_logs! do
+    File.ls!()
+    |> Enum.filter(&String.contains?(&1, ".log"))
+    |> Enum.each(&File.rm/1)
+  end
 end
