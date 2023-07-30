@@ -63,7 +63,7 @@ defmodule YapIEx.Components.MultiModalText do
 
   def update(%{cursor: cursor, content: content} = model, {:event, %{key: key}})
       when key in @k_backspaces do
-    {until_cursor, after_cursor} = split_content_at_cursor(content, cursor)
+    {until_cursor, after_cursor} = split_content_before_cursor(content, cursor)
 
     content = String.slice(until_cursor, 0..-2) <> after_cursor
     new_cursor = move_cursor_left(cursor)
@@ -72,12 +72,11 @@ defmodule YapIEx.Components.MultiModalText do
   end
 
   def update(%{cursor: cursor, content: content} = model, {:event, %{key: @k_delete}}) do
-    {until_cursor, after_cursor} = split_content_at_cursor(content, cursor)
+    {until_cursor, after_cursor} = split_content_before_cursor(content, cursor)
 
     content = until_cursor <> String.slice(after_cursor, 1..String.length(after_cursor))
-    new_cursor = move_cursor_left(cursor)
 
-    %{model | content: content, cursor: new_cursor}
+    %{model | content: content, cursor: cursor}
   end
 
   def update(%{cursor: cursor, content: content} = model, {:event, %{key: @k_spacebar}}) do
@@ -90,7 +89,7 @@ defmodule YapIEx.Components.MultiModalText do
   end
 
   def update(%{cursor: cursor, content: content} = model, {:event, %{ch: ch}}) when ch > 0 do
-    {until_cursor, after_cursor} = split_content_at_cursor(content, cursor)
+    {until_cursor, after_cursor} = split_content_before_cursor(content, cursor)
 
     content = until_cursor <> <<ch::utf8>> <> after_cursor
     cursor = move_cursor_right(content, cursor)
@@ -111,7 +110,9 @@ defmodule YapIEx.Components.MultiModalText do
   def render(%{content: content, cursor: cursor}) do
     view do
       if cursor >= String.length(content) do
-        label(content: content <> "█")
+        label do
+          text(content: content <> "█")
+        end
       else
         {before_cursor, after_cursor} = split_content_at_cursor(content, cursor)
 
@@ -133,8 +134,28 @@ defmodule YapIEx.Components.MultiModalText do
   # it returns two strings splitting the content,
   # the first string goes from the beginning until the cursor (including it),
   # the second string starts with the character after the cursor, and goes until the end
+  #
+  #  0123456789
+  # *-----------
+  # |abc
+  # *-----------
+  # |  ^
+  #
+  # split_content_at_cursor("abc", 2) returns {"abc", ""}
   defp split_content_at_cursor(content, cursor) do
     # cursor + 1 because the cursor index is 0-based
     String.split_at(content, cursor + 1)
+  end
+
+  #  0123456789
+  # *-----------
+  # |abc
+  # *-----------
+  # |  ^
+  #
+  # split_content_before_cursor("abc", 2) returns {"ab", "c"}
+  defp split_content_before_cursor(content, cursor) do
+    # cursor because the cursor index is 0-based
+    String.split_at(content, cursor)
   end
 end
